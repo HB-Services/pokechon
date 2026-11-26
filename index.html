@@ -61,9 +61,15 @@ label{font-size:12px;color:#8a92a8;display:block;text-align:left}
 .winners{max-width:1100px;margin:10px auto;padding:0 16px}
 .winner-row{background:#1e2538;border:1px solid #2b3350;padding:12px 16px;border-radius:12px;display:flex;justify-content:space-between;margin-bottom:8px;font-size:14px}
 .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#fff;color:#000;padding:11px 18px;border-radius:30px;font-weight:700;display:none;z-index:200}
+.auth-tabs{display:flex;gap:8px;margin-bottom:10px}
+.auth-tabs button{flex:1;padding:11px;border-radius:12px;border:1px solid #2b3350;background:#131724;color:#fff;font-weight:800;cursor:pointer}
+.auth-tabs button.active{background:#2ecc8a;color:#000}
+.support-btn{position:fixed;bottom:20px;right:20px;background:#25D366;color:#fff;width:60px;height:60px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:28px;z-index:150;text-decoration:none;box-shadow:0 8px 20px rgba(0,0,0,.5)}
+.user-chip{background:#2ecc8a;color:#000;padding:9px 14px;border-radius:30px;font-weight:800;font-size:13px}
 </style>
 </head>
-<body><header>
+<body>
+<header>
   <div class="header-in">
     <div class="logo" id="logo">POKE<span>CHON</span><small>GIFT PACKS</small></div>
     <div class="header-actions">
@@ -75,6 +81,7 @@ label{font-size:12px;color:#8a92a8;display:block;text-align:left}
         <option value="tr">Türkçe</option>
       </select>
       <div class="pill"><span class="diamond"></span> <span id="myBalance">$0.00</span></div>
+      <div id="authArea" style="display:flex;gap:8px;align-items:center"></div>
       <button class="btn-deposit" id="depositBtn">Dépôt</button>
       <button class="btn-withdraw" id="withdrawBtnTop">Retrait</button>
     </div>
@@ -85,14 +92,30 @@ label{font-size:12px;color:#8a92a8;display:block;text-align:left}
 
 <div class="balance-bar">
   <div class="balance-card">
-    <div><div class="muted small" id="t_balance_label">Votre solde</div><div class="balance-big"><span id="balanceBig">$0.00</span></div><div class="muted small" id="t_balance_sub">Gain réel • Retirable en USDT</div></div>
+    <div><div class="muted small" id="t_balance_label">Votre solde</div><div class="balance-big"><span id="balanceBig">$0.00</span></div><div class="muted small" id="t_balance_sub">Gain réel • Retirable en USDT</div><div class="muted small" id="userInfoLine" style="margin-top:4px"></div></div>
     <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn-deposit" id="topupBtn2">Dépôt USDT</button><button class="btn-withdraw" id="withdrawBtn2">Retrait</button></div>
   </div>
 </div>
 
 <div class="grid" id="grid"></div>
-<div class="winners"><h3 id="t_winners">Derniers gagnants</h3><div id="winnersList"></div></div>
-
+<div class="winners"><h3 id="t_winners">Derniers gagnants</h3><div id="winnersList"></div></div><!-- AUTH MODAL -->
+<div class="modal" id="authModal">
+  <div class="modal-box" style="text-align:left">
+    <h2 class="center" id="authTitle">Connexion</h2>
+    <div class="auth-tabs">
+      <button id="tabLogin" class="active" onclick="switchAuthTab('login')">Connexion</button>
+      <button id="tabReg" onclick="switchAuthTab('register')">S'inscrire</button>
+    </div>
+    <label>Nom d'utilisateur</label><input id="authUser" placeholder="Ex: amine_27">
+    <label>Mot de passe</label><input id="authPass" type="password" placeholder="••••••••">
+    <div id="regExtra" style="display:none">
+      <label>Numéro WhatsApp</label><input id="authPhone" placeholder="Ex: 0550 00 00 00">
+    </div>
+    <p id="authMsg" style="color:#ff6b6b;font-size:13px;text-align:center"></p>
+    <button class="btn" style="background:#2ecc8a" id="authSubmitBtn">Continuer</button>
+    <button class="btn dark" onclick="hideModal('authModal')">Fermer</button>
+  </div>
+</div>
 <div class="modal" id="topupModal">
   <div class="modal-box" style="text-align:left">
     <h2 class="center">Dépôt USDT</h2>
@@ -122,9 +145,7 @@ label{font-size:12px;color:#8a92a8;display:block;text-align:left}
   </div>
 </div>
 
-<div class="modal" id="winModal"><div class="modal-box"><div class="muted small" id="t_win_label">Gain réel ajouté à votre solde</div><h2 id="winPackName"></h2><div class="amount" id="winAmount"></div><div class="meta" id="winMeta"></div><button class="btn" id="closeWinBtn">Terminé</button><button class="btn dark" id="withdrawFromWin">Retirer mes gains</button></div></div>
-
-<div class="modal" id="adminModal">
+<div class="modal" id="winModal"><div class="modal-box"><div class="muted small" id="t_win_label">Gain réel ajouté à votre solde</div><h2 id="winPackName"></h2><div class="amount" id="winAmount"></div><div class="meta" id="winMeta"></div><button class="btn" id="closeWinBtn">Terminé</button><button class="btn dark" id="withdrawFromWin">Retirer mes gains</button></div></div><div class="modal" id="adminModal">
   <div class="modal-box" style="text-align:left;max-width:520px">
     <h2 class="center">Panneau Admin</h2>
     <label>Password</label><input id="pass" type="password">
@@ -137,11 +158,11 @@ label{font-size:12px;color:#8a92a8;display:block;text-align:left}
         <label>Nouveau mot de passe</label><input id="newPass" type="password" placeholder="Min 4 caractères">
         <label>Confirmer nouveau</label><input id="newPass2" type="password" placeholder="Répéter">
         <button class="btn" style="background:#2ecc8a" id="changePassBtn">Changer le mot de passe</button>
-        <p class="muted small">Le nouveau mot de passe est enregistré et reste même après fermeture du site.</p>
       </div>
       <div id="editArea"></div>
+      <h3>👥 Utilisateurs inscrits</h3><div id="usersList"></div>
       <h3>Retraits en attente</h3><div id="withdrawList"></div>
- <h3>Ajouter un *</h3><label>Utilisateur</label><input id="wName"><label>Pack</label><select id="wPack"></select><label>Valeur $</label><input id="wAmount" type="number">
+      <h3>Ajouter un gagnant</h3><label>Utilisateur</label><input id="wName"><label>Pack</label><select id="wPack"></select><label>Valeur $</label><input id="wAmount" type="number">
       <button class="btn" id="addWinnerBtn">Enregistrer</button>
       <button class="btn dark" id="resetBtn">Réinitialiser</button>
     </div>
@@ -149,6 +170,7 @@ label{font-size:12px;color:#8a92a8;display:block;text-align:left}
     <button class="btn dark" id="closeAdminBtn">Fermer</button>
   </div>
 </div>
+
 
 <div class="toast" id="toast"></div><script>
 var I18N = {
@@ -159,13 +181,12 @@ var I18N = {
   tr:{badge:"Gerçek $ Kazanç • USDT Çekim",packs_title:"Hediye Paketleri",packs_sub:"Bir paket seç, aç, gerçek dolar kazanç bakiyene eklensin",winners:"Son Kazananlar",deposit:"Yatırma",withdraw:"Çekim",open:"Paketi Aç",need_money:"Yetersiz Bakiye - Yatırma",max:"Kadar kazan",win_label:"Gerçek kazanç eklendi",balance_label:"Bakiyeniz",balance_sub:"Gerçek kazanç • USDT ile çekilebilir"}
 };
 var lang = 'fr';
-// 12 عرض
 var packs = [
   {id:'mini', name:'Mini', price:5, max:48.50, ret:90, color:'linear-gradient(160deg,#e0f7ff,#8ad0e8)', img:'', tag:'NEW'},
   {id:'starter', name:'Starter', price:10, max:98.50, ret:90, color:'linear-gradient(160deg,#d6e8ff,#7aa5d6)', img:'', tag:''},
   {id:'bronze', name:'Bronze', price:28, max:280.37, ret:90, color:'linear-gradient(160deg,#f7c08a,#b06a2e)', img:'', tag:''},
   {id:'silver', name:'Silver', price:48, max:476.02, ret:90, color:'linear-gradient(160deg,#f8fafc,#8e9aa8)', img:'', tag:''},
-  {id:'gold', name:'Gold', price:88, max:873.66, ret:90, color:'linear-gradient(160deg,#fff8a8,#e6c400)', img:'', tag:''},
+  {id:'gold', name:'Gold', price:88, max:873.66, ret:90, color:'linear-gradient(160deg,#fff8a8,#e6c400)', img:'', tag:'POPULAIRE'},
   {id:'lucky', name:'Lucky', price:128, max:1262.37, ret:90, color:'linear-gradient(160deg,#2e2e2e,#000)', img:'', tag:'HOT', lucky:true},
   {id:'diamond', name:'Diamond', price:198, max:1950.00, ret:92, color:'linear-gradient(160deg,#d8f6ff,#6ec6e8)', img:'', tag:'VIP'},
   {id:'platinum', name:'Platinum', price:350, max:3450.00, ret:92, color:'linear-gradient(160deg,#e8e8ff,#9a9ad6)', img:'', tag:'VIP'},
@@ -178,7 +199,43 @@ var winners = [{name:'user_41', pack:'Lucky', amount:312},{name:'user_18', pack:
 var withdraws = [];
 var balance = 0;
 var addrs = {BEP20:'0xF5DE551585Dbe6f95c1A46ecC9acC8e4643d1466', ERC20:'0xF5DE551585Dbe6f95c1A46ecC9acC8e4643d1466', TRC20:'TDxgQ31JQyQvCYsHwQnuZ4UvLnFDd7sHcx'};
-// كلمة سر الأدمن - تتغير من الأدمن و تبقى محفوظة
+// ===== SYSTEME COMPTES =====
+var users = JSON.parse(localStorage.getItem('poke_users')||'{}');
+var currentUser = localStorage.getItem('poke_current')||null;
+var authMode = 'login';
+function saveUsers(){ localStorage.setItem('poke_users', JSON.stringify(users)); if(currentUser) localStorage.setItem('poke_current', currentUser); else localStorage.removeItem('poke_current'); }
+function syncBalanceToUser(){ if(currentUser && users[currentUser]){ users[currentUser].balance = balance; saveUsers(); } }
+function loadUserBalance(){ if(currentUser && users[currentUser]){ balance = users[currentUser].balance||0; } else { balance = 0; } }
+function switchAuthTab(m){ authMode=m; document.getElementById('tabLogin').classList.toggle('active',m==='login'); document.getElementById('tabReg').classList.toggle('active',m==='register'); document.getElementById('authTitle').textContent = m==='login'?'Connexion':'Créer un compte'; document.getElementById('regExtra').style.display = m==='register'?'block':'none'; document.getElementById('authMsg').textContent=''; }
+function openAuth(m){ switchAuthTab(m||'login'); showModal('authModal'); }
+function renderAuthArea(){
+  var el=document.getElementById('authArea');
+  if(currentUser && users[currentUser]){
+    el.innerHTML='<span class="user-chip">👤 '+currentUser+'</span><button class="btn-withdraw" style="padding:9px 14px" onclick="logoutUser()">Sortir</button>';
+    document.getElementById('userInfoLine').textContent='Connecté en tant que '+currentUser+' • '+ (users[currentUser].phone||'');
+  }else{
+    el.innerHTML='<button class="btn-withdraw" style="padding:9px 14px" onclick="openAuth(\'login\')">Connexion</button><button class="btn-deposit" onclick="openAuth(\'register\')">S\'inscrire</button>';
+    document.getElementById('userInfoLine').textContent='Connecte-toi pour jouer avec ton propre solde';
+  }
+}
+function logoutUser(){ currentUser=null; balance=0; saveUsers(); renderAuthArea(); render(); toast('Déconnecté'); }
+function doAuth(){
+  var name=document.getElementById('authUser').value.trim();
+  var pass=document.getElementById('authPass').value;
+  var phone=document.getElementById('authPhone').value.trim();
+  var msg=document.getElementById('authMsg');
+  if(!name||!pass){ msg.textContent='Remplis nom + mot de passe'; return; }
+  if(authMode==='register'){
+    if(users[name]){ msg.textContent='Ce nom existe déjà, choisis un autre'; return; }
+    users[name]={name:name,pass:pass,phone:phone,balance:0,history:[]};
+    currentUser=name; balance=0; saveUsers(); hideModal('authModal'); renderAuthArea(); render(); toast('Bienvenue '+name+' 🎉 Compte créé !');
+  }else{
+    if(!users[name]||users[name].pass!==pass){ msg.textContent='Nom ou mot de passe incorrect'; return; }
+    currentUser=name; loadUserBalance(); saveUsers(); hideModal('authModal'); renderAuthArea(); render(); toast('Bienvenue '+name+' 👋');
+  }
+}
+document.getElementById('authSubmitBtn').onclick=doAuth;
+// ===== FIN COMPTES =====
 var ADMIN_PASS = localStorage.getItem('poke_admin_pass') || '1234';
 function t(k){ return (I18N[lang] && I18N[lang][k]) || I18N.fr[k] || k; }
 function toast(m){ var el=document.getElementById('toast'); el.textContent=m; el.style.display='block'; setTimeout(function(){el.style.display='none';},3500); }
@@ -216,7 +273,10 @@ function render(){
   document.getElementById('adminAddrEVM').value = addrs.BEP20;
   document.getElementById('adminAddrTRC').value = addrs.TRC20;
   document.getElementById('withdrawList').innerHTML = withdraws.length ? withdraws.map(function(w){return '<div style="background:#131724;padding:10px;border-radius:10px;margin-bottom:6px;font-size:13px">'+w.amount+'$ → '+w.addr+' ('+w.network+') — '+w.status+'</div>';}).join('') : '<p class="muted small">Aucun retrait</p>';
+  var uList = Object.values(users).map(function(u){ return '<div style="background:#131724;padding:10px;border-radius:10px;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center"><span>👤 <b>'+u.name+'</b><br><span class="muted small">'+(u.phone||'')+' • '+money(u.balance)+' • '+(u.history?u.history.length:0)+' packs</span></span><button class="btn" style="width:auto;padding:8px 12px;background:#2ecc8a;margin:0" onclick="adminAddBalance(\''+u.name+'\')">+ Solde</button></div>'; }).join('') || '<p class="muted small">Aucun utilisateur inscrit pour le moment</p>';
+  document.getElementById('usersList').innerHTML = uList;
 }
+function adminAddBalance(name){ var a=parseFloat(prompt('Combien ajouter à '+name+' ?')); if(!a) return; users[name].balance=(users[name].balance||0)+a; if(currentUser===name) balance=users[name].balance; saveUsers(); render(); toast('Solde ajouté à '+name); }
 function setLang(l){
   lang = l;
   document.documentElement.lang = l;
@@ -235,6 +295,7 @@ function setLang(l){
   render();
 }
 function openPack(id){
+  if(!currentUser){ openAuth('login'); toast('Connecte-toi d\'abord pour ouvrir un pack !'); return; }
   var p = null;
   for(var i=0;i<packs.length;i++){ if(packs[i].id===id) p=packs[i]; }
   if(balance < p.price){ openTopup(); return; }
@@ -242,15 +303,17 @@ function openPack(id){
   var big = Math.random() < 0.06;
   var win = big ? Math.floor(p.max*0.35 + Math.random()*p.max*0.4) : Math.floor(p.price*(p.ret/100)*(0.4+Math.random()*0.9)*0.5);
   win = Math.max(2, win); balance += win;
+  if(users[currentUser]){ users[currentUser].history = users[currentUser].history||[]; users[currentUser].history.unshift({pack:p.name,win:win,date:new Date().toLocaleString()}); }
+  syncBalanceToUser();
   document.getElementById('winPackName').textContent = p.name.toUpperCase()+' PACK';
   document.getElementById('winAmount').textContent = '+'+money(win);
   document.getElementById('winMeta').innerHTML = 'Gain réel ajouté à votre solde<br>Nouveau solde: '+money(balance)+'<br>Retirable en USDT à tout moment';
   showModal('winModal');
-  winners.unshift({name:'Vous', pack:p.name, amount:win});
+  winners.unshift({name:currentUser, pack:p.name, amount:win});
   render();
 }
-function openTopup(){ document.getElementById('depositAddr').textContent = addrs[document.getElementById('network').value]; showModal('topupModal'); }
-function openWithdraw(){ showModal('withdrawModal'); }
+function openTopup(){ if(!currentUser){ openAuth('login'); toast('Crée un compte pour déposer'); return; } document.getElementById('depositAddr').textContent = addrs[document.getElementById('network').value]; showModal('topupModal'); }
+function openWithdraw(){ if(!currentUser){ openAuth('login'); toast('Connecte-toi pour retirer'); return; } showModal('withdrawModal'); }
 function calcDeposit(){ var u=parseFloat(document.getElementById('usdtAmount').value||'0'); document.getElementById('pointsPreview').textContent = money(u); }
 function calcWithdraw(){ var u=parseFloat(document.getElementById('wAmount').value||'0'); var net = Math.max(0, u-1); document.getElementById('wPreview').textContent = money(net); }
 document.getElementById('langSelect').onchange = function(){ setLang(this.value); };
@@ -263,22 +326,21 @@ document.getElementById('network').onchange = function(){ document.getElementByI
 document.getElementById('usdtAmount').oninput = calcDeposit;
 document.getElementById('wAmount').oninput = calcWithdraw;
 document.getElementById('copyBtn').onclick = function(){ navigator.clipboard.writeText(document.getElementById('depositAddr').textContent); toast('Copié'); };
-document.getElementById('confirmBtn').onclick = function(){ var h=document.getElementById('txid').value.trim(); if(!h||h.length<10){ toast('Entrez un vrai TxHash'); return; } var amt=parseFloat(document.getElementById('usdtAmount').value||'0'); balance+=amt; render(); hideModal('topupModal'); toast('Dépôt reçu: +'+money(amt)); };
+document.getElementById('confirmBtn').onclick = function(){ var h=document.getElementById('txid').value.trim(); if(!h||h.length<10){ toast('Entrez un vrai TxHash'); return; } var amt=parseFloat(document.getElementById('usdtAmount').value||'0'); balance+=amt; syncBalanceToUser(); render(); hideModal('topupModal'); toast('Dépôt reçu: +'+money(amt)); };
 document.getElementById('confirmWithdrawBtn').onclick = function(){
   var amt=parseFloat(document.getElementById('wAmount').value||'0');
   var addr=document.getElementById('wAddress').value.trim();
   if(!addr||addr.length<10){ toast('Entrez votre adresse USDT'); return; }
   if(amt<10){ toast('Min retrait 10$'); return; }
   if(amt>balance){ toast('Solde insuffisant'); return; }
-  balance-=amt; withdraws.unshift({amount:amt, addr:addr, network:document.getElementById('wNetwork').value, status:'En attente'});
+  balance-=amt; syncBalanceToUser(); withdraws.unshift({amount:amt, addr:addr, network:document.getElementById('wNetwork').value, status:'En attente - '+currentUser});
   render(); hideModal('withdrawModal'); toast('Retrait demandé: '+money(amt)+' — en attente admin');
 };
 document.getElementById('closeTopupBtn').onclick = function(){ hideModal('topupModal'); };
 document.getElementById('closeWithdrawBtn').onclick = function(){ hideModal('withdrawModal'); };
 document.getElementById('closeWinBtn').onclick = function(){ hideModal('winModal'); };
 document.getElementById('closeAdminBtn').onclick = function(){ hideModal('adminModal'); };
-document.getElementById('loginBtn').onclick = function(){ if(document.getElementById('pass').value===ADMIN_PASS){ document.getElementById('adminContent').style.display='block'; document.getElementById('loginBtn').style.display='none'; } else toast('Mot de passe incorrect'); };
-// تغيير كلمة السر
+document.getElementById('loginBtn').onclick = function(){ if(document.getElementById('pass').value===ADMIN_PASS){ document.getElementById('adminContent').style.display='block'; document.getElementById('loginBtn').style.display='none'; render(); } else toast('Mot de passe incorrect'); };
 document.getElementById('changePassBtn').onclick = function(){
   var oldP = document.getElementById('oldPass').value;
   var np = document.getElementById('newPass').value;
@@ -311,6 +373,8 @@ document.getElementById('logo').onclick = function(){
   var n=Date.now(); if(n-lastClick>800) clicks=0; lastClick=n; clicks++;
   if(clicks>=5){ clicks=0; showModal('adminModal'); }
 };
+loadUserBalance();
+renderAuthArea();
 render();
 setLang('fr');
 calcDeposit();
