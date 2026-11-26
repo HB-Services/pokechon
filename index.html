@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="fr" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>POKECHON</title>
+<style>
+*{box-sizing:border-box;font-family:system-ui,Arial}
+body{background:#141b2e;color:#fff;margin:0;padding-bottom:30px}
+header{position:sticky;top:0;z-index:50;background:rgba(20,27,46,.95);border-bottom:1px solid #232c46}
+.header-in{max-width:1100px;margin:auto;padding:14px 16px;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.logo{font-weight:900;font-size:26px;cursor:pointer;line-height:1}
+.logo span{color:#2ecc8a}
+.logo small{display:block;font-size:10px;letter-spacing:3px;color:#8a92a8;font-weight:600;margin-top:3px}
+.header-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.header-actions select{background:#1a2033;color:#fff;border:1px solid #2b3350;padding:9px 12px;border-radius:20px;font-weight:600}
+.pill{background:#1a2033;border:1px solid #2b3350;padding:9px 14px;border-radius:30px;font-weight:700;display:flex;gap:8px;align-items:center}
+.diamond{width:14px;height:14px;background:#2ecc8a;transform:rotate(45deg);display:inline-block;border-radius:2px}
+.btn-deposit{background:#2ecc8a;color:#000;border:0;padding:11px 18px;border-radius:30px;font-weight:900;cursor:pointer}
+.btn-withdraw{background:#fff;color:#000;border:0;padding:11px 18px;border-radius:30px;font-weight:800;cursor:pointer}
+.btn{width:100%;margin-top:10px;background:#fff;color:#000;border:0;padding:13px;border-radius:12px;font-weight:800;cursor:pointer}
+.btn.dark{background:#2a324f;color:#fff}
+.hero{max-width:1100px;margin:18px auto 0;padding:0 16px}
+.hero h1{margin:0;font-size:32px}
+.hero p{color:#8a92a8;margin:6px 0}
+.badge{display:inline-block;background:#1e2a2a;color:#2ecc8a;border:1px solid #234a38;padding:5px 10px;border-radius:20px;font-size:12px;font-weight:700}
+.muted{color:#8a92a8}.small{font-size:13px}.center{text-align:center}
+.balance-bar{max-width:1100px;margin:14px auto;padding:0 16px}
+.balance-card{background:linear-gradient(90deg,#1e2436,#162a2a);border:1px solid #2b3350;border-radius:18px;padding:18px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.balance-big{font-size:28px;font-weight:900}
+.balance-big span{color:#2ecc8a}
+.grid{max-width:1100px;margin:18px auto;padding:0 16px;display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(min-width:850px){.grid{grid-template-columns:repeat(4,1fr)}}
+.card{background:#1e2538;border:1px solid #2b3350;border-radius:22px;overflow:hidden;box-shadow:0 12px 26px rgba(0,0,0,.28)}
+.pack-wrap{height:222px;position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden;background:#1a2033}
+.pack-wrap img{width:100%;height:100%;object-fit:cover}
+.bag-fallback{width:104px;height:162px;position:relative;filter:drop-shadow(0 18px 20px rgba(0,0,0,.6));display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;border-radius:4px}
+.bag-oval{width:58px;height:82px;border-radius:50%;background:rgba(255,255,255,.35);display:flex;align-items:center;justify-content:center;position:relative}
+.bag-oval::after{content:"";position:absolute;inset:8px 10px;border-radius:50%;border:1px solid rgba(0,0,0,.15)}
+.bag-line{position:absolute;left:50%;top:6px;bottom:6px;width:2px;background:#111;transform:translateX(-50%)}
+.bag-diamond{width:10px;height:10px;background:#111;transform:rotate(45deg);position:relative;z-index:2}
+.bag-bottom{font-size:9px;font-weight:900;letter-spacing:1px;text-align:center;line-height:1.3}
+.bag-bottom small{display:block;font-size:7px;font-weight:600;letter-spacing:2px;opacity:.85}
+.bolt-svg{width:68px;height:88px;filter:drop-shadow(0 0 14px rgba(255,204,0,.7))}
+.card-body{padding:16px}.card-body h3{margin:0;font-size:19px}
+.max{color:#2ecc8a;font-weight:700;margin:6px 0 14px;font-size:14px}
+.row{display:flex;justify-content:space-between;align-items:center}
+.price{font-weight:800;font-size:20px;display:flex;gap:6px;align-items:center}
+.return{color:#8a92a8;font-size:13px}
+.tag{position:absolute;top:10px;left:10px;background:#ffcc00;color:#000;font-size:11px;font-weight:900;padding:4px 8px;border-radius:20px;z-index:5}
+.tag.hot{background:#ff4757;color:#fff}
+.tag.vip{background:#8b5cf6;color:#fff}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.85);display:none;align-items:center;justify-content:center;padding:16px;z-index:99}
+.modal-box{background:#1e2436;border:1px solid #2b3350;border-radius:22px;padding:24px;width:100%;max-width:470px;text-align:center;max-height:92vh;overflow:auto}
+.amount{font-size:42px;font-weight:800;color:#2ecc8a}
+.meta{color:#8a92a8;font-size:13px;line-height:1.9}
+input,select{width:100%;padding:12px;border-radius:10px;border:1px solid #2b3350;background:#131724;color:#fff;margin:6px 0}
+label{font-size:12px;color:#8a92a8;display:block;text-align:left}
+.addr-box{background:#131724;border:1px dashed #3a4466;padding:12px;border-radius:12px;word-break:break-all;font-size:13px;text-align:left;direction:ltr}
+.preview{background:#131724;padding:12px;border-radius:12px;display:flex;justify-content:space-between}
+.winners{max-width:1100px;margin:10px auto;padding:0 16px}
+.winner-row{background:#1e2538;border:1px solid #2b3350;padding:12px 16px;border-radius:12px;display:flex;justify-content:space-between;margin-bottom:8px;font-size:14px}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#fff;color:#000;padding:11px 18px;border-radius:30px;font-weight:700;display:none;z-index:200}
+</style>
+</head>
+<body><header>
+  <div class="header-in">
+    <div class="logo" id="logo">POKE<span>CHON</span><small>GIFT PACKS</small></div>
+    <div class="header-actions">
+      <select id="langSelect">
+        <option value="fr">Français</option>
+        <option value="ar">العربية</option>
+        <option value="en">English</option>
+        <option value="es">Español</option>
+        <option value="tr">Türkçe</option>
+      </select>
+      <div class="pill"><span class="diamond"></span> <span id="myBalance">$0.00</span></div>
+      <button class="btn-deposit" id="depositBtn">Dépôt</button>
+      <button class="btn-withdraw" id="withdrawBtnTop">Retrait</button>
+    </div>
+  </div>
+</header>
+
+<div class="hero"><span class="badge" id="t_badge">Gain réel en $ • Retrait USDT</span><h1 id="t_packs_title" style="margin-top:10px">Packs Cadeaux</h1><p id="t_packs_sub">Choisissez un pack, ouvrez-le, recevez un gain réel en dollars ajouté à votre solde</p></div>
+
+<div class="balance-bar">
+  <div class="balance-card">
+    <div><div class="muted small" id="t_balance_label">Votre solde</div><div class="balance-big"><span id="balanceBig">$0.00</span></div><div class="muted small" id="t_balance_sub">Gain réel • Retirable en USDT</div></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn-deposit" id="topupBtn2">Dépôt USDT</button><button class="btn-withdraw" id="withdrawBtn2">Retrait</button></div>
+  </div>
+</div>
+
+<div class="grid" id="grid"></div>
+<div class="winners"><h3 id="t_winners">Derniers gagnants</h3><div id="winnersList"></div></div>
+
+<div class="modal" id="topupModal">
+  <div class="modal-box" style="text-align:left">
+    <h2 class="center">Dépôt USDT</h2>
+    <p class="muted small center">Min 10 USDT • 1 USDT = 1$ de solde</p>
+    <label>Réseau</label>
+    <select id="network"><option value="BEP20">BEP20 - BNB Chain</option><option value="ERC20">ERC20 - Ethereum</option><option value="TRC20">TRC20 - Tron</option></select>
+    <label>Montant USDT</label><input id="usdtAmount" type="number" value="20">
+    <div class="preview"><span>Vous recevrez</span><b id="pointsPreview">$20.00</b></div>
+    <label>Adresse plateforme</label><div class="addr-box" id="depositAddr"></div>
+    <button class="btn dark" id="copyBtn">Copier l'adresse</button>
+    <label>TxHash après envoi</label><input id="txid" placeholder="0x...">
+    <button class="btn" id="confirmBtn">Confirmer — J'ai envoyé</button>
+    <button class="btn dark" id="closeTopupBtn">Fermer</button>
+  </div>
+</div>
+
+<div class="modal" id="withdrawModal">
+  <div class="modal-box" style="text-align:left">
+    <h2 class="center">Retrait USDT</h2>
+    <p class="muted small center">Min 10$ • Frais: 1$ • Délai: 5-30 min</p>
+    <label>Réseau</label><select id="wNetwork"><option value="BEP20">BEP20 - BNB Chain</option><option value="TRC20">TRC20 - Tron</option><option value="ERC20">ERC20 - Ethereum</option></select>
+    <label>Votre adresse USDT</label><input id="wAddress" placeholder="0x... ou T...">
+    <label>Montant à retirer $</label><input id="wAmount" type="number" placeholder="Ex: 50">
+    <div class="preview"><span>Vous recevrez</span><b id="wPreview">$0.00</b></div>
+    <button class="btn" style="background:#2ecc8a" id="confirmWithdrawBtn">Confirmer le retrait</button>
+    <button class="btn dark" id="closeWithdrawBtn">Fermer</button>
+  </div>
+</div>
+
+<div class="modal" id="winModal"><div class="modal-box"><div class="muted small" id="t_win_label">Gain réel ajouté à votre solde</div><h2 id="winPackName"></h2><div class="amount" id="winAmount"></div><div class="meta" id="winMeta"></div><button class="btn" id="closeWinBtn">Terminé</button><button class="btn dark" id="withdrawFromWin">Retirer mes gains</button></div></div>
+
+<div class="modal" id="adminModal">
+  <div class="modal-box" style="text-align:left;max-width:520px">
+    <h2 class="center">Panneau Admin</h2>
+    <label>Password</label><input id="pass" type="password">
+    <div id="adminContent" style="display:none">
+      <label>Adresse plateforme BEP20 / ERC20</label><input id="adminAddrEVM">
+      <label>Adresse plateforme TRC20</label><input id="adminAddrTRC">
+      <div style="background:#131724;border:1px solid #2b3350;border-radius:14px;padding:14px;margin:12px 0">
+        <h3 style="margin:0 0 8px">Changer le mot de passe Admin</h3>
+        <label>Ancien mot de passe</label><input id="oldPass" type="password" placeholder="Ancien">
+        <label>Nouveau mot de passe</label><input id="newPass" type="password" placeholder="Min 4 caractères">
+        <label>Confirmer nouveau</label><input id="newPass2" type="password" placeholder="Répéter">
+        <button class="btn" style="background:#2ecc8a" id="changePassBtn">Changer le mot de passe</button>
+        <p class="muted small">Le nouveau mot de passe est enregistré et reste même après fermeture du site.</p>
+      </div>
+      <div id="editArea"></div>
+      <h3>Retraits en attente</h3><div id="withdrawList"></div>
+ <h3>Ajouter un *</h3><label>Utilisateur</label><input id="wName"><label>Pack</label><select id="wPack"></select><label>Valeur $</label><input id="wAmount" type="number">
+      <button class="btn" id="addWinnerBtn">Enregistrer</button>
+      <button class="btn dark" id="resetBtn">Réinitialiser</button>
+    </div>
+    <button class="btn" id="loginBtn">Entrer</button>
+    <button class="btn dark" id="closeAdminBtn">Fermer</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div><script>
+var I18N = {
+  fr:{badge:"Gain réel en $ • Retrait USDT",packs_title:"Packs Cadeaux",packs_sub:"Choisissez un pack, ouvrez-le, recevez un gain réel en dollars ajouté à votre solde",winners:"Derniers gagnants",deposit:"Dépôt",withdraw:"Retrait",open:"Ouvrir le pack",need_money:"Solde insuffisant - Dépôt",max:"Gain jusqu'à",win_label:"Gain réel ajouté à votre solde",balance_label:"Votre solde",balance_sub:"Gain réel • Retirable en USDT"},
+  ar:{badge:"ربح حقيقي بالدولار • سحب USDT",packs_title:"الباكات",packs_sub:"اختر الباك، افتحه، و احصل على ربح حقيقي بالدولار يضاف لرصيدك",winners:"آخر الفائزين",deposit:"إيداع",withdraw:"سحب",open:"فتح الباك",need_money:"رصيد غير كاف - إيداع",max:"ربح حتى",win_label:"ربح حقيقي أضيف لرصيدك",balance_label:"رصيدك",balance_sub:"ربح حقيقي • قابل للسحب USDT"},
+  en:{badge:"Real gain in $ • USDT Withdraw",packs_title:"Gift Packs",packs_sub:"Pick a pack, open it, get a real dollar gain added to your balance",winners:"Latest Winners",deposit:"Deposit",withdraw:"Withdraw",open:"Open Pack",need_money:"Insufficient - Deposit",max:"Win up to",win_label:"Real gain added to your balance",balance_label:"Your balance",balance_sub:"Real gain • Withdrawable in USDT"},
+  es:{badge:"Ganancia real en $ • Retiro USDT",packs_title:"Packs Regalo",packs_sub:"Elige un pack, ábrelo y recibe ganancia real en dólares",winners:"Últimos ganadores",deposit:"Depósito",withdraw:"Retiro",open:"Abrir Pack",need_money:"Saldo insuficiente - Depósito",max:"Gana hasta",win_label:"Ganancia real añadida",balance_label:"Tu saldo",balance_sub:"Ganancia real • Retirable en USDT"},
+  tr:{badge:"Gerçek $ Kazanç • USDT Çekim",packs_title:"Hediye Paketleri",packs_sub:"Bir paket seç, aç, gerçek dolar kazanç bakiyene eklensin",winners:"Son Kazananlar",deposit:"Yatırma",withdraw:"Çekim",open:"Paketi Aç",need_money:"Yetersiz Bakiye - Yatırma",max:"Kadar kazan",win_label:"Gerçek kazanç eklendi",balance_label:"Bakiyeniz",balance_sub:"Gerçek kazanç • USDT ile çekilebilir"}
+};
+var lang = 'fr';
+// 12 عرض
+var packs = [
+  {id:'mini', name:'Mini', price:5, max:48.50, ret:90, color:'linear-gradient(160deg,#e0f7ff,#8ad0e8)', img:'', tag:'NEW'},
+  {id:'starter', name:'Starter', price:10, max:98.50, ret:90, color:'linear-gradient(160deg,#d6e8ff,#7aa5d6)', img:'', tag:''},
+  {id:'bronze', name:'Bronze', price:28, max:280.37, ret:90, color:'linear-gradient(160deg,#f7c08a,#b06a2e)', img:'', tag:''},
+  {id:'silver', name:'Silver', price:48, max:476.02, ret:90, color:'linear-gradient(160deg,#f8fafc,#8e9aa8)', img:'', tag:''},
+  {id:'gold', name:'Gold', price:88, max:873.66, ret:90, color:'linear-gradient(160deg,#fff8a8,#e6c400)', img:'', tag:''},
+  {id:'lucky', name:'Lucky', price:128, max:1262.37, ret:90, color:'linear-gradient(160deg,#2e2e2e,#000)', img:'', tag:'HOT', lucky:true},
+  {id:'diamond', name:'Diamond', price:198, max:1950.00, ret:92, color:'linear-gradient(160deg,#d8f6ff,#6ec6e8)', img:'', tag:'VIP'},
+  {id:'platinum', name:'Platinum', price:350, max:3450.00, ret:92, color:'linear-gradient(160deg,#e8e8ff,#9a9ad6)', img:'', tag:'VIP'},
+  {id:'royal', name:'Royal', price:500, max:4980.00, ret:95, color:'linear-gradient(160deg,#2a0a3a,#7a1a9a)', img:'', tag:'ROYAL', lucky:true},
+  {id:'elite', name:'Elite', price:750, max:7450.00, ret:95, color:'linear-gradient(160deg,#1a2a1a,#2ecc8a)', img:'', tag:'ELITE'},
+  {id:'ultimate', name:'Ultimate', price:1000, max:9950.00, ret:96, color:'linear-gradient(160deg,#fff3c4,#f39c12)', img:'', tag:'ULTIMATE'},
+  {id:'mega', name:'Mega', price:1500, max:14900.00, ret:96, color:'linear-gradient(160deg,#111,#ff4757)', img:'', tag:'MEGA', lucky:true}
+];
+var winners = [{name:'user_41', pack:'Lucky', amount:312},{name:'user_18', pack:'Gold', amount:145},{name:'user_77', pack:'Diamond', amount:820},{name:'user_99', pack:'Royal', amount:2100}];
+var withdraws = [];
+var balance = 0;
+var addrs = {BEP20:'0xF5DE551585Dbe6f95c1A46ecC9acC8e4643d1466', ERC20:'0xF5DE551585Dbe6f95c1A46ecC9acC8e4643d1466', TRC20:'TDxgQ31JQyQvCYsHwQnuZ4UvLnFDd7sHcx'};
+// كلمة سر الأدمن - تتغير من الأدمن و تبقى محفوظة
+var ADMIN_PASS = localStorage.getItem('poke_admin_pass') || '1234';
+function t(k){ return (I18N[lang] && I18N[lang][k]) || I18N.fr[k] || k; }
+function toast(m){ var el=document.getElementById('toast'); el.textContent=m; el.style.display='block'; setTimeout(function(){el.style.display='none';},3500); }
+function showModal(id){ document.getElementById(id).style.display='flex'; }
+function hideModal(id){ document.getElementById(id).style.display='none'; }
+function money(n){ return '$'+n.toFixed(2); }
+function boltSVG(){ return '<svg class="bolt-svg" viewBox="0 0 100 140"><path d="M62 2 L18 78 L46 78 L36 138 L88 52 L58 52 Z" fill="#ffcc00" stroke="#7a5a00" stroke-width="3" stroke-linejoin="round"/></svg>'; }
+function bagHTML(p){
+  if(p.img) return '<img src="'+p.img+'">';
+  var tagHtml = p.tag ? '<div class="tag'+(p.tag==='HOT'?' hot':'')+(p.tag==='VIP'?' vip':'')+'">'+p.tag+'</div>' : '';
+  if(p.lucky) return tagHtml+'<div class="bag-fallback" style="background:'+p.color+'">'+boltSVG()+'<div class="bag-bottom"><small>POKECHON</small>'+p.name.toUpperCase()+'</div></div>';
+  return tagHtml+'<div class="bag-fallback" style="background:'+p.color+'"><div class="bag-oval"><div class="bag-line"></div><div class="bag-diamond"></div></div><div class="bag-bottom"><small>POKECHON</small>'+p.name.toUpperCase()+'</div></div>';
+}
+function render(){
+  var grid = document.getElementById('grid');
+  var html = '';
+  for(var i=0;i<packs.length;i++){
+    var p = packs[i];
+    var btnTxt = balance >= p.price ? t('open') : t('deposit');
+    var btnAction = balance >= p.price ? "openPack('"+p.id+"')" : "openTopup()";
+    html += '<div class="card"><div class="pack-wrap">'+bagHTML(p)+'</div><div class="card-body"><h3>'+p.name+'</h3><div class="max">'+t('max')+' '+money(p.max)+'</div><div class="row"><div class="price"><span class="diamond"></span> '+money(p.price)+'</div><div class="return">'+p.ret+'%</div></div><button class="btn" onclick="'+btnAction+'">'+btnTxt+'</button></div></div>';
+  }
+  grid.innerHTML = html;
+  var wHtml = '';
+  for(var j=0;j<winners.length;j++){ wHtml += '<div class="winner-row"><span>'+winners[j].name+' — '+winners[j].pack+'</span><b style="color:#2ecc8a">+'+money(winners[j].amount)+'</b></div>'; }
+  document.getElementById('winnersList').innerHTML = wHtml;
+  document.getElementById('myBalance').textContent = money(balance);
+  document.getElementById('balanceBig').textContent = money(balance);
+  var eHtml = '';
+  for(var k=0;k<packs.length;k++){
+    eHtml += '<div style="background:#131724;border:1px solid #2b3350;border-radius:14px;padding:12px;margin-bottom:8px;text-align:left"><b>'+packs[k].name+' PACK</b><label>Price $</label><input id="ep'+k+'" type="number" value="'+packs[k].price+'"><label>Max Gain $</label><input id="em'+k+'" type="number" value="'+packs[k].max+'"><label>Return %</label><input id="er'+k+'" type="number" value="'+packs[k].ret+'"><label>Image URL</label><input id="ei'+k+'" value="'+packs[k].img+'" placeholder="https://.../gold.png"></div>';
+  }
+  document.getElementById('editArea').innerHTML = eHtml;
+  document.getElementById('wPack').innerHTML = packs.map(function(p){return '<option>'+p.name+'</option>';}).join('');
+  document.getElementById('adminAddrEVM').value = addrs.BEP20;
+  document.getElementById('adminAddrTRC').value = addrs.TRC20;
+  document.getElementById('withdrawList').innerHTML = withdraws.length ? withdraws.map(function(w){return '<div style="background:#131724;padding:10px;border-radius:10px;margin-bottom:6px;font-size:13px">'+w.amount+'$ → '+w.addr+' ('+w.network+') — '+w.status+'</div>';}).join('') : '<p class="muted small">Aucun retrait</p>';
+}
+function setLang(l){
+  lang = l;
+  document.documentElement.lang = l;
+  document.documentElement.dir = (l==='ar') ? 'rtl' : 'ltr';
+  document.getElementById('t_badge').textContent = t('badge');
+  document.getElementById('t_packs_title').textContent = t('packs_title');
+  document.getElementById('t_packs_sub').textContent = t('packs_sub');
+  document.getElementById('t_winners').textContent = t('winners');
+  document.getElementById('t_balance_label').textContent = t('balance_label');
+  document.getElementById('t_balance_sub').textContent = t('balance_sub');
+  document.getElementById('t_win_label').textContent = t('win_label');
+  document.getElementById('depositBtn').textContent = t('deposit');
+  document.getElementById('topupBtn2').textContent = t('deposit')+' USDT';
+  document.getElementById('withdrawBtnTop').textContent = t('withdraw');
+  document.getElementById('withdrawBtn2').textContent = t('withdraw');
+  render();
+}
+function openPack(id){
+  var p = null;
+  for(var i=0;i<packs.length;i++){ if(packs[i].id===id) p=packs[i]; }
+  if(balance < p.price){ openTopup(); return; }
+  balance -= p.price;
+  var big = Math.random() < 0.06;
+  var win = big ? Math.floor(p.max*0.35 + Math.random()*p.max*0.4) : Math.floor(p.price*(p.ret/100)*(0.4+Math.random()*0.9)*0.5);
+  win = Math.max(2, win); balance += win;
+  document.getElementById('winPackName').textContent = p.name.toUpperCase()+' PACK';
+  document.getElementById('winAmount').textContent = '+'+money(win);
+  document.getElementById('winMeta').innerHTML = 'Gain réel ajouté à votre solde<br>Nouveau solde: '+money(balance)+'<br>Retirable en USDT à tout moment';
+  showModal('winModal');
+  winners.unshift({name:'Vous', pack:p.name, amount:win});
+  render();
+}
+function openTopup(){ document.getElementById('depositAddr').textContent = addrs[document.getElementById('network').value]; showModal('topupModal'); }
+function openWithdraw(){ showModal('withdrawModal'); }
+function calcDeposit(){ var u=parseFloat(document.getElementById('usdtAmount').value||'0'); document.getElementById('pointsPreview').textContent = money(u); }
+function calcWithdraw(){ var u=parseFloat(document.getElementById('wAmount').value||'0'); var net = Math.max(0, u-1); document.getElementById('wPreview').textContent = money(net); }
+document.getElementById('langSelect').onchange = function(){ setLang(this.value); };
+document.getElementById('depositBtn').onclick = openTopup;
+document.getElementById('topupBtn2').onclick = openTopup;
+document.getElementById('withdrawBtnTop').onclick = openWithdraw;
+document.getElementById('withdrawBtn2').onclick = openWithdraw;
+document.getElementById('withdrawFromWin').onclick = function(){ hideModal('winModal'); openWithdraw(); };
+document.getElementById('network').onchange = function(){ document.getElementById('depositAddr').textContent = addrs[this.value]; };
+document.getElementById('usdtAmount').oninput = calcDeposit;
+document.getElementById('wAmount').oninput = calcWithdraw;
+document.getElementById('copyBtn').onclick = function(){ navigator.clipboard.writeText(document.getElementById('depositAddr').textContent); toast('Copié'); };
+document.getElementById('confirmBtn').onclick = function(){ var h=document.getElementById('txid').value.trim(); if(!h||h.length<10){ toast('Entrez un vrai TxHash'); return; } var amt=parseFloat(document.getElementById('usdtAmount').value||'0'); balance+=amt; render(); hideModal('topupModal'); toast('Dépôt reçu: +'+money(amt)); };
+document.getElementById('confirmWithdrawBtn').onclick = function(){
+  var amt=parseFloat(document.getElementById('wAmount').value||'0');
+  var addr=document.getElementById('wAddress').value.trim();
+  if(!addr||addr.length<10){ toast('Entrez votre adresse USDT'); return; }
+  if(amt<10){ toast('Min retrait 10$'); return; }
+  if(amt>balance){ toast('Solde insuffisant'); return; }
+  balance-=amt; withdraws.unshift({amount:amt, addr:addr, network:document.getElementById('wNetwork').value, status:'En attente'});
+  render(); hideModal('withdrawModal'); toast('Retrait demandé: '+money(amt)+' — en attente admin');
+};
+document.getElementById('closeTopupBtn').onclick = function(){ hideModal('topupModal'); };
+document.getElementById('closeWithdrawBtn').onclick = function(){ hideModal('withdrawModal'); };
+document.getElementById('closeWinBtn').onclick = function(){ hideModal('winModal'); };
+document.getElementById('closeAdminBtn').onclick = function(){ hideModal('adminModal'); };
+document.getElementById('loginBtn').onclick = function(){ if(document.getElementById('pass').value===ADMIN_PASS){ document.getElementById('adminContent').style.display='block'; document.getElementById('loginBtn').style.display='none'; } else toast('Mot de passe incorrect'); };
+// تغيير كلمة السر
+document.getElementById('changePassBtn').onclick = function(){
+  var oldP = document.getElementById('oldPass').value;
+  var np = document.getElementById('newPass').value;
+  var np2 = document.getElementById('newPass2').value;
+  if(oldP !== ADMIN_PASS){ toast('Ancien mot de passe incorrect'); return; }
+  if(!np || np.length < 4){ toast('Nouveau mot de passe: min 4 caractères'); return; }
+  if(np !== np2){ toast('Confirmation différente'); return; }
+  ADMIN_PASS = np;
+  localStorage.setItem('poke_admin_pass', np);
+  document.getElementById('oldPass').value=''; document.getElementById('newPass').value=''; document.getElementById('newPass2').value='';
+  toast('Mot de passe changé avec succès');
+};
+document.getElementById('addWinnerBtn').onclick = function(){
+  for(var i=0;i<packs.length;i++){
+    packs[i].price = +document.getElementById('ep'+i).value;
+    packs[i].max = +document.getElementById('em'+i).value;
+    packs[i].ret = +document.getElementById('er'+i).value;
+    packs[i].img = document.getElementById('ei'+i).value;
+  }
+  addrs.BEP20 = document.getElementById('adminAddrEVM').value; addrs.ERC20 = addrs.BEP20; addrs.TRC20 = document.getElementById('adminAddrTRC').value;
+  var n=document.getElementById('wName').value||'user';
+  var pk=document.getElementById('wPack').value;
+  var a=+document.getElementById('wAmount').value||10;
+  winners.unshift({name:n, pack:pk, amount:a});
+  render(); toast('Gagnant enregistré');
+};
+document.getElementById('resetBtn').onclick = function(){ location.reload(); };
+var clicks=0, lastClick=0;
+document.getElementById('logo').onclick = function(){
+  var n=Date.now(); if(n-lastClick>800) clicks=0; lastClick=n; clicks++;
+  if(clicks>=5){ clicks=0; showModal('adminModal'); }
+};
+render();
+setLang('fr');
+calcDeposit();
+document.getElementById('depositAddr').textContent = addrs.BEP20;
+</script>
+</body>
+</html>
