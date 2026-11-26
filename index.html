@@ -73,7 +73,6 @@ label{font-size:12px;color:#8a92a8;display:block;text-align:left}
 .auth-tabs button{flex:1;padding:11px;border-radius:12px;border:1px solid #2b3350;background:#131724;color:#fff;font-weight:800;cursor:pointer}
 .auth-tabs button.active{background:#2ecc8a;color:#000}
 .user-chip{background:#2ecc8a;color:#000;padding:9px 14px;border-radius:30px;font-weight:800;font-size:13px}
-/* SUPPORT CHAT */
 .support-top{background:#1a2033;border:1px solid #2b3350;color:#fff;padding:9px 14px;border-radius:20px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:6px;font-size:13px}
 .support-top:hover{border-color:#2ecc8a}
 .support-top .dot{width:8px;height:8px;background:#2ecc8a;border-radius:50%;display:inline-block}
@@ -85,7 +84,19 @@ label{font-size:12px;color:#8a92a8;display:block;text-align:left}
 .chat-input-row{display:flex;gap:8px}
 .chat-input-row input{margin:0;flex:1}
 .chat-input-row button{width:auto;margin:0;padding:12px 18px;background:#2ecc8a;border:0;border-radius:10px;font-weight:900;cursor:pointer;color:#000}
-@media(max-width:600px){.header-actions{justify-content:center}.header-actions button,.header-actions select{padding:8px 12px;font-size:13px}}
+.header-top{display:flex;justify-content:space-between;align-items:center;width:100%}
+.header-mid{display:flex;gap:8px;align-items:center;width:100%}
+.header-mid .pill{flex:1;justify-content:center}
+.header-mid select{flex:1}
+.header-actions{width:100%}
+.header-actions button{flex:1}
+.header-money .btn-deposit,.header-money .btn-withdraw{flex:1;padding:12px;text-align:center}
+#authArea button{flex:1;padding:11px 10px;text-align:center}
+.chat-user-btn{width:100%;text-align:left;background:#131724;border:1px solid #2b3350;color:#fff;padding:11px 12px;border-radius:12px;cursor:pointer;margin-bottom:6px;font-weight:700;display:flex;justify-content:space-between;align-items:center}
+.chat-user-btn.active{background:#2ecc8a;color:#000;border-color:#2ecc8a}
+.chat-user-btn .badge-count{background:#ff4757;color:#fff;font-size:11px;padding:3px 8px;border-radius:20px}
+.chat-user-btn.active .badge-count{background:#000;color:#fff}
+@media(min-width:850px){.header-in{flex-direction:row;flex-wrap:nowrap}.header-top,.header-mid,.header-actions{width:auto}.header-mid .pill{flex:none}.header-mid select{flex:none}}
 </style>
 </head>
 <body>
@@ -124,7 +135,6 @@ label{font-size:12px;color:#8a92a8;display:block;text-align:left}
 </div>
 <div class="grid" id="grid"></div>
 <div class="winners"><h3 id="t_winners">Derniers gagnants</h3><div id="winnersList"></div></div>
-
 <div class="modal" id="authModal">
   <div class="modal-box" style="text-align:left">
     <h2 class="center" id="authTitle">Connexion</h2>
@@ -146,15 +156,15 @@ label{font-size:12px;color:#8a92a8;display:block;text-align:left}
 <div class="modal" id="topupModal">
   <div class="modal-box" style="text-align:left">
     <h2 class="center">Dépôt USDT</h2>
-    <p class="muted small center">Min 10 USDT • 1 USDT = 1$ de solde</p>
+    <p class="muted small center">Min 10 USDT • 1 USDT = 1$ de solde • Vérification admin</p>
     <label>Réseau</label>
     <select id="network"><option value="BEP20">BEP20 - BNB Chain</option><option value="ERC20">ERC20 - Ethereum</option><option value="TRC20">TRC20 - Tron</option></select>
     <label>Montant USDT</label><input id="usdtAmount" type="number" value="20">
     <div class="preview"><span>Vous recevrez</span><b id="pointsPreview">$20.00</b></div>
     <label>Adresse plateforme</label><div class="addr-box" id="depositAddr"></div>
     <button class="btn dark" id="copyBtn">Copier l'adresse</button>
-    <label>TxHash après envoi</label><input id="txid" placeholder="0x...">
-    <button class="btn" id="confirmBtn">Confirmer — J'ai envoyé</button>
+    <label>TxHash après envoi (Hash de transaction, pas l'adresse)</label><input id="txid" placeholder="0x... (66 caractères BEP20) ou 64 caractères TRC20">
+    <button class="btn" id="confirmBtn">Envoyer pour vérification</button>
     <button class="btn dark" id="closeTopupBtn">Fermer</button>
   </div>
 </div>
@@ -202,11 +212,13 @@ label{font-size:12px;color:#8a92a8;display:block;text-align:left}
         <button class="btn" style="background:#2ecc8a" id="changePassBtn">Changer le mot de passe</button>
       </div>
       <div id="editArea"></div>
-      <h3>💬 Messages Support</h3>
-      <label>Choisir utilisateur</label><select id="chatUserSelect" onchange="renderAdminChat()"></select>
+      <h3>💬 Messages Support — Cliquez sur un utilisateur</h3>
+      <div id="chatUserList"></div>
+      <div style="background:#1e2a2a;border:1px solid #2ecc8a55;padding:8px 12px;border-radius:10px;margin:8px 0;font-size:13px">Conversation avec : <b id="adminChatWith" style="color:#2ecc8a">—</b></div>
       <div class="chat-box" id="adminChatBox" style="height:200px"></div>
       <div class="chat-input-row"><input id="adminChatInput" placeholder="Répondre..."><button onclick="adminSendChat()">Envoyer</button></div>
       <h3 style="margin-top:16px">👥 Utilisateurs inscrits</h3><div id="usersList"></div>
+      <h3>💰 Dépôts en attente — Vérifier TxHash sur BscScan / Tronscan</h3><div id="depositList"></div>
       <h3>Retraits en attente</h3><div id="withdrawList"></div>
       <h3>Ajouter un gagnant</h3><label>Utilisateur</label><input id="wName"><label>Pack</label><select id="wPack"></select><label>Valeur $</label><input id="wAmount" type="number">
       <button class="btn" id="addWinnerBtn">Enregistrer</button>
@@ -216,7 +228,6 @@ label{font-size:12px;color:#8a92a8;display:block;text-align:left}
     <button class="btn dark" id="closeAdminBtn">Fermer</button>
   </div>
 </div>
-
 <div class="toast" id="toast"></div><script>
 var I18N = {
   fr:{badge:"Gain réel en $ • Retrait USDT",packs_title:"Packs Cadeaux",packs_sub:"Choisissez un pack, ouvrez-le, recevez un gain réel en dollars ajouté à votre solde",winners:"Derniers gagnants",deposit:"Dépôt",withdraw:"Retrait",open:"Ouvrir le pack",need_money:"Solde insuffisant - Dépôt",max:"Gain jusqu'à",win_label:"Gain réel ajouté à votre solde",balance_label:"Votre solde",balance_sub:"Gain réel • Retirable en USDT",confirm_pass:"Confirmer le mot de passe",offer1_title:"BONUS BIENVENUE +20%",offer1_desc:"Premier dépôt: dépose 20$ et reçois 24$ de solde. Offre unique.",offer2_title:"BONUS QUOTIDIEN",offer2_desc:"Reviens chaque jour et reçois 1$ gratuit sur ton solde. Sans dépôt.",offer3_title:"PARRAINAGE +2$",offer3_desc:"Invite un ami. Quand il dépose, tu reçois 2$ automatiquement.",claim:"Réclamer",claimed:"Déjà réclamé aujourd'hui"},
@@ -242,13 +253,15 @@ var packs = [
 ];
 var winners = [{name:'user_41', pack:'Lucky', amount:312},{name:'user_18', pack:'Gold', amount:145},{name:'user_77', pack:'Diamond', amount:820},{name:'user_99', pack:'Royal', amount:2100}];
 var withdraws = JSON.parse(localStorage.getItem('poke_withdraws')||'[]');
+var deposits = JSON.parse(localStorage.getItem('poke_deposits')||'[]');
+function saveDeposits(){ localStorage.setItem('poke_deposits', JSON.stringify(deposits)); }
 var balance = 0;
 var addrs = {BEP20:'0xF5DE551585Dbe6f95c1A46ecC9acC8e4643d1466', ERC20:'0xF5DE551585Dbe6f95c1A46ecC9acC8e4643d1466', TRC20:'TDxgQ31JQyQvCYsHwQnuZ4UvLnFDd7sHcx'};
-  var users = JSON.parse(localStorage.getItem('poke_users')||'{}');
+var users = JSON.parse(localStorage.getItem('poke_users')||'{}');
 var currentUser = localStorage.getItem('poke_current')||null;
 var authMode = 'login';
-// ===== CHAT SYSTEM =====
 var chats = JSON.parse(localStorage.getItem('poke_chats')||'{}');
+var adminChatUser = localStorage.getItem('poke_admin_chat')||'';
 function saveChats(){ localStorage.setItem('poke_chats', JSON.stringify(chats)); }
 function saveWithdraws(){ localStorage.setItem('poke_withdraws', JSON.stringify(withdraws)); }
 function saveUsers(){ localStorage.setItem('poke_users', JSON.stringify(users)); if(currentUser) localStorage.setItem('poke_current', currentUser); else localStorage.removeItem('poke_current'); }
@@ -259,10 +272,10 @@ function openAuth(m){ switchAuthTab(m||'login'); showModal('authModal'); }
 function renderAuthArea(){
   var el=document.getElementById('authArea');
   if(currentUser && users[currentUser]){
-    el.innerHTML='<span class="user-chip">👤 '+currentUser+'</span><button class="btn-withdraw" style="padding:9px 14px" onclick="logoutUser()">Sortir</button>';
+    el.innerHTML='<span class="user-chip" style="flex:1;text-align:center">👤 '+currentUser+'</span><button class="btn-withdraw" onclick="logoutUser()">Sortir</button>';
     document.getElementById('userInfoLine').textContent='Connecté en tant que '+currentUser;
   }else{
-    el.innerHTML='<button class="btn-withdraw" style="padding:9px 14px" onclick="openAuth(\'login\')">Connexion</button><button class="btn-deposit" onclick="openAuth(\'register\')">S\'inscrire</button>';
+    el.innerHTML='<button class="btn-withdraw" onclick="openAuth(\'login\')">Connexion</button><button class="btn-deposit" onclick="openAuth(\'register\')">S\'inscrire</button>';
     document.getElementById('userInfoLine').textContent='Connecte-toi pour jouer avec ton propre solde';
   }
 }
@@ -305,7 +318,6 @@ function adminDeleteUser(name){
   if(currentUser===name){ currentUser=null; balance=0; }
   saveUsers(); renderAuthArea(); render(); toast('Utilisateur supprimé');
 }
-// ===== CHAT FUNCTIONS =====
 function openChat(){
   if(!currentUser){ openAuth('login'); toast('Connecte-toi pour parler au support'); return; }
   if(!chats[currentUser]) chats[currentUser]=[{from:'admin',text:'Bonjour '+currentUser+' 👋 Comment puis-je t\'aider ? Pose ta question sur dépôt / retrait / packs.',time:new Date().toLocaleString()}];
@@ -324,23 +336,40 @@ function sendChatMsg(){
   if(!chats[currentUser]) chats[currentUser]=[];
   chats[currentUser].push({from:currentUser,text:txt,time:new Date().toLocaleString()});
   saveChats(); inp.value=''; renderChat(); toast('Message envoyé au support');
+      }
+  // ===== ADMIN CHAT FIX - BOUTONS AU LIEU DE SELECT =====
+function selectAdminChat(user){
+  adminChatUser=user;
+  localStorage.setItem('poke_admin_chat', user);
+  renderAdminChat();
+  toast('Conversation: '+user);
 }
 function renderAdminChat(){
-  var sel=document.getElementById('chatUserSelect'); if(!sel) return;
+  var listEl=document.getElementById('chatUserList'); if(!listEl) return;
   var keys=Object.keys(chats);
-  sel.innerHTML = keys.length ? keys.map(function(k){return '<option value="'+k+'">'+k+' ('+(chats[k].length)+' msgs)</option>';}).join('') : '<option value="">Aucun message</option>';
-  var user=sel.value; var box=document.getElementById('adminChatBox');
-  if(!user||!chats[user]){ box.innerHTML='<p class="muted small">Aucun message</p>'; return; }
-  box.innerHTML=chats[user].map(function(m){ return '<div class="chat-msg '+(m.from==='admin'?'mine':'theirs')+'">'+m.text+'<small>'+(m.from==='admin'?'Toi (Admin)':user)+' • '+m.time+'</small></div>'; }).join('');
+  if(!keys.length){ listEl.innerHTML='<p class="muted small">Aucun message</p>'; document.getElementById('adminChatBox').innerHTML='<p class="muted small">Aucun message</p>'; return; }
+  if(!adminChatUser || !chats[adminChatUser]){ adminChatUser=keys[0]; localStorage.setItem('poke_admin_chat', adminChatUser); }
+  listEl.innerHTML=keys.map(function(k){
+    var last = chats[k][chats[k].length-1];
+    var isUserMsg = last && last.from!=='admin';
+    return '<button class="chat-user-btn '+(k===adminChatUser?'active':'')+'" onclick="selectAdminChat(\''+k+'\')"><span>👤 '+k+'</span><span class="badge-count">'+chats[k].length+' msgs'+(isUserMsg?' • NEW':'')+'</span></button>';
+  }).join('');
+  var withEl=document.getElementById('adminChatWith'); if(withEl) withEl.textContent=adminChatUser;
+  var box=document.getElementById('adminChatBox');
+  box.innerHTML=chats[adminChatUser].map(function(m){ return '<div class="chat-msg '+(m.from==='admin'?'mine':'theirs')+'">'+m.text+'<small>'+(m.from==='admin'?'Toi (Admin)':adminChatUser)+' • '+m.time+'</small></div>'; }).join('');
   box.scrollTop=box.scrollHeight;
 }
 function adminSendChat(){
-  var sel=document.getElementById('chatUserSelect'); var user=sel.value; if(!user) return;
+  if(!adminChatUser || !chats[adminChatUser]){ toast('Choisis un utilisateur d\'abord'); return; }
   var inp=document.getElementById('adminChatInput'); var txt=inp.value.trim(); if(!txt) return;
-  chats[user].push({from:'admin',text:txt,time:new Date().toLocaleString()});
-  saveChats(); inp.value=''; renderAdminChat(); render(); toast('Réponse envoyée à '+user);
+  chats[adminChatUser].push({from:'admin',text:txt,time:new Date().toLocaleString()});
+  saveChats(); inp.value='';
+  var oldRender = render;
+  renderAdminChat();
+  toast('Réponse envoyée à '+adminChatUser);
 }
-document.getElementById('chatInput').addEventListener('keypress',function(e){ if(e.key==='Enter') sendChatMsg(); });var ADMIN_PASS = localStorage.getItem('poke_admin_pass') || '1234';
+document.getElementById('chatInput').addEventListener('keypress',function(e){ if(e.key==='Enter') sendChatMsg(); });
+document.getElementById('adminChatInput').addEventListener('keypress',function(e){ if(e.key==='Enter') adminSendChat(); });var ADMIN_PASS = localStorage.getItem('poke_admin_pass') || '1234';
 function t(k){ return (I18N[lang] && I18N[lang][k]) || I18N.fr[k] || k; }
 function toast(m){ var el=document.getElementById('toast'); el.textContent=m; el.style.display='block'; setTimeout(function(){el.style.display='none';},3500); }
 function showModal(id){ document.getElementById(id).style.display='flex'; }
@@ -353,6 +382,7 @@ function bagHTML(p){
   if(p.lucky) return tagHtml+'<div class="bag-fallback" style="background:'+p.color+'">'+boltSVG()+'<div class="bag-bottom"><small>POKECHON</small>'+p.name.toUpperCase()+'</div></div>';
   return tagHtml+'<div class="bag-fallback" style="background:'+p.color+'"><div class="bag-oval"><div class="bag-line"></div><div class="bag-diamond"></div></div><div class="bag-bottom"><small>POKECHON</small>'+p.name.toUpperCase()+'</div></div>';
 }
+function setEl(id,txt){ var e=document.getElementById(id); if(e) e.textContent=txt; }
 function render(){
   var grid = document.getElementById('grid');
   var html = '';
@@ -381,12 +411,25 @@ function render(){
   document.getElementById('wPack').innerHTML = packs.map(function(p){return '<option>'+p.name+'</option>';}).join('');
   document.getElementById('adminAddrEVM').value = addrs.BEP20;
   document.getElementById('adminAddrTRC').value = addrs.TRC20;
+  var depEl=document.getElementById('depositList');
+  if(depEl) depEl.innerHTML = deposits.length ? deposits.map(function(d,i){return '<div style="background:#131724;padding:10px;border-radius:10px;margin-bottom:6px;font-size:13px"><b>'+d.amount+'$</b> de <b>'+d.user+'</b> ('+d.network+')<br><span style="word-break:break-all;color:#8a92a8">Tx: '+d.tx+'</span><br>'+d.status+' • '+(d.date||'')+'<br><div style="display:flex;gap:6px;margin-top:8px"><button class="btn" style="padding:8px;margin:0;background:#2ecc8a" onclick="adminApproveDeposit('+i+')">✅ Approuver + Solde</button><button class="btn" style="padding:8px;margin:0;background:#ff4757" onclick="adminRejectDeposit('+i+')">❌ Refuser</button></div></div>';}).join('') : '<p class="muted small">Aucun dépôt</p>';
   document.getElementById('withdrawList').innerHTML = withdraws.length ? withdraws.map(function(w,i){return '<div style="background:#131724;padding:10px;border-radius:10px;margin-bottom:6px;font-size:13px">'+w.amount+'$ → '+w.addr+' ('+w.network+') — '+w.status+'<br><div style="display:flex;gap:6px;margin-top:8px"><button class="btn" style="padding:8px;margin:0;background:#2ecc8a" onclick="adminApproveWithdraw('+i+')">✅ Payé</button><button class="btn" style="padding:8px;margin:0;background:#ff4757" onclick="adminRejectWithdraw('+i+')">❌ Refuser</button></div></div>';}).join('') : '<p class="muted small">Aucun retrait</p>';
   var uList = Object.values(users).map(function(u){ return '<div style="background:#131724;padding:10px;border-radius:10px;margin-bottom:6px"><div style="display:flex;justify-content:space-between;align-items:center"><span>👤 <b>'+u.name+'</b><br><span class="muted small">Créé: '+(u.created||'-')+' • '+money(u.balance)+' • '+(u.history?u.history.length:0)+' packs</span></span><div style="display:flex;gap:6px"><button class="btn" style="width:auto;padding:8px 12px;background:#2ecc8a;margin:0" onclick="adminAddBalance(\''+u.name+'\')">+ Solde</button><button class="btn" style="width:auto;padding:8px 10px;background:#ff4757;margin:0" onclick="adminDeleteUser(\''+u.name+'\')">✕</button></div></div></div>'; }).join('') || '<p class="muted small">Aucun utilisateur inscrit pour le moment</p>';
   document.getElementById('usersList').innerHTML = uList;
   renderAdminChat();
 }
 function adminAddBalance(name){ var a=parseFloat(prompt('Combien ajouter à '+name+' ?')); if(!a) return; users[name].balance=(users[name].balance||0)+a; if(currentUser===name) balance=users[name].balance; saveUsers(); render(); toast('Solde ajouté à '+name); }
+function adminApproveDeposit(i){
+  var d=deposits[i];
+  if(d.status!=='En attente') return;
+  if(users[d.user]){ users[d.user].balance=(users[d.user].balance||0)+d.amount; if(currentUser===d.user) balance=users[d.user].balance; }
+  deposits[i].status='Approuvé ✅';
+  saveDeposits(); saveUsers(); render(); toast('Dépôt approuvé +'+d.amount+'$ à '+d.user);
+}
+function adminRejectDeposit(i){
+  deposits[i].status='Refusé ❌';
+  saveDeposits(); render(); toast('Dépôt refusé');
+}
 function adminApproveWithdraw(i){
   withdraws[i].status='Payé ✅ - '+withdraws[i].user;
   saveWithdraws(); render(); toast('Retrait marqué Payé');
@@ -401,23 +444,23 @@ function setLang(l){
   lang = l;
   document.documentElement.lang = l;
   document.documentElement.dir = (l==='ar') ? 'rtl' : 'ltr';
-  document.getElementById('t_badge').textContent = t('badge');
-  document.getElementById('t_packs_title').textContent = t('packs_title');
-  document.getElementById('t_packs_sub').textContent = t('packs_sub');
-  document.getElementById('t_winners').textContent = t('winners');
-  document.getElementById('t_balance_label').textContent = t('balance_label');
-  document.getElementById('t_balance_sub').textContent = t('balance_sub');
-  document.getElementById('t_win_label').textContent = t('win_label');
-  document.getElementById('depositBtn').textContent = t('deposit');
-  document.getElementById('topupBtn2').textContent = t('deposit')+' USDT';
-  document.getElementById('withdrawBtnTop').textContent = t('withdraw');
-  document.getElementById('withdrawBtn2').textContent = t('withdraw');
-  document.getElementById('t_offer1_title').textContent = t('offer1_title');
-  document.getElementById('t_offer1_desc').innerHTML = t('offer1_desc');
-  document.getElementById('t_offer2_title').textContent = t('offer2_title');
-  document.getElementById('t_offer2_desc').innerHTML = t('offer2_desc');
-  document.getElementById('t_offer3_title').textContent = t('offer3_title');
-  document.getElementById('t_offer3_desc').innerHTML = t('offer3_desc');
+  setEl('t_badge', t('badge'));
+  setEl('t_packs_title', t('packs_title'));
+  setEl('t_packs_sub', t('packs_sub'));
+  setEl('t_winners', t('winners'));
+  setEl('t_balance_label', t('balance_label'));
+  setEl('t_balance_sub', t('balance_sub'));
+  setEl('t_win_label', t('win_label'));
+  setEl('depositBtn', t('deposit'));
+  setEl('topupBtn2', t('deposit')+' USDT');
+  setEl('withdrawBtnTop', t('withdraw'));
+  setEl('withdrawBtn2', t('withdraw'));
+  setEl('t_offer1_title', t('offer1_title'));
+  var o1=document.getElementById('t_offer1_desc'); if(o1) o1.innerHTML=t('offer1_desc');
+  setEl('t_offer2_title', t('offer2_title'));
+  var o2=document.getElementById('t_offer2_desc'); if(o2) o2.innerHTML=t('offer2_desc');
+  setEl('t_offer3_title', t('offer3_title'));
+  var o3=document.getElementById('t_offer3_desc'); if(o3) o3.innerHTML=t('offer3_desc');
   var lc=document.getElementById('labelConfirm'); if(lc) lc.textContent=t('confirm_pass');
   render();
 }
@@ -453,7 +496,17 @@ document.getElementById('network').onchange = function(){ document.getElementByI
 document.getElementById('usdtAmount').oninput = calcDeposit;
 document.getElementById('wAmount').oninput = calcWithdraw;
 document.getElementById('copyBtn').onclick = function(){ navigator.clipboard.writeText(document.getElementById('depositAddr').textContent); toast('Copié'); };
-document.getElementById('confirmBtn').onclick = function(){ var h=document.getElementById('txid').value.trim(); if(!h||h.length<10){ toast('Entrez un vrai TxHash'); return; } var amt=parseFloat(document.getElementById('usdtAmount').value||'0'); balance+=amt; syncBalanceToUser(); render(); hideModal('topupModal'); toast('Dépôt reçu: +'+money(amt)); };
+document.getElementById('confirmBtn').onclick = function(){
+  var h=document.getElementById('txid').value.trim();
+  if(!h||h.length<20){ toast('TxHash invalide - colle le vrai Hash de ton wallet'); return; }
+  if(h===addrs.BEP20||h===addrs.TRC20){ toast('Ça c\'est l\'adresse, pas le TxHash !'); return; }
+  var amt=parseFloat(document.getElementById('usdtAmount').value||'0');
+  if(amt<10){ toast('Min dépôt 10 USDT'); return; }
+  deposits.unshift({amount:amt, tx:h, network:document.getElementById('network').value, user:currentUser, status:'En attente', date:new Date().toLocaleString()});
+  saveDeposits(); render(); hideModal('topupModal');
+  document.getElementById('txid').value='';
+  toast('Demande envoyée - Admin va vérifier ton TxHash');
+};
 document.getElementById('confirmWithdrawBtn').onclick = function(){
   var amt=parseFloat(document.getElementById('wAmount').value||'0');
   var addr=document.getElementById('wAddress').value.trim();
