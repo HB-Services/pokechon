@@ -25,6 +25,14 @@ header{position:sticky;top:0;z-index:50;background:rgba(20,27,46,.95);border-bot
 .hero p{color:#8a92a8;margin:6px 0}
 .badge{display:inline-block;background:#1e2a2a;color:#2ecc8a;border:1px solid #234a38;padding:5px 10px;border-radius:20px;font-size:12px;font-weight:700}
 .muted{color:#8a92a8}.small{font-size:13px}.center{text-align:center}
+.offers{max-width:1100px;margin:16px auto;padding:0 16px;display:grid;grid-template-columns:1fr;gap:12px}
+@media(min-width:850px){.offers{grid-template-columns:repeat(3,1fr)}}
+.offer{background:linear-gradient(135deg,#1e2538,#162a2a);border:1px solid #2ecc8a55;border-radius:18px;padding:16px}
+.offer h3{margin:0 0 6px;font-size:17px}
+.offer p{margin:0 0 12px;color:#8a92a8;font-size:13px;line-height:1.5}
+.offer b{color:#2ecc8a}
+.offer-btn{background:#2ecc8a;color:#000;border:0;padding:10px 16px;border-radius:20px;font-weight:900;cursor:pointer;width:100%}
+.offer-btn:disabled{background:#2a324f;color:#8a92a8;cursor:not-allowed}
 .balance-bar{max-width:1100px;margin:14px auto;padding:0 16px}
 .balance-card{background:linear-gradient(90deg,#1e2436,#162a2a);border:1px solid #2b3350;border-radius:18px;padding:18px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
 .balance-big{font-size:28px;font-weight:900}
@@ -64,7 +72,6 @@ label{font-size:12px;color:#8a92a8;display:block;text-align:left}
 .auth-tabs{display:flex;gap:8px;margin-bottom:10px}
 .auth-tabs button{flex:1;padding:11px;border-radius:12px;border:1px solid #2b3350;background:#131724;color:#fff;font-weight:800;cursor:pointer}
 .auth-tabs button.active{background:#2ecc8a;color:#000}
-.support-btn{position:fixed;bottom:20px;right:20px;background:#25D366;color:#fff;width:60px;height:60px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:28px;z-index:150;text-decoration:none;box-shadow:0 8px 20px rgba(0,0,0,.5)}
 .user-chip{background:#2ecc8a;color:#000;padding:9px 14px;border-radius:30px;font-weight:800;font-size:13px}
 </style>
 </head>
@@ -87,18 +94,19 @@ label{font-size:12px;color:#8a92a8;display:block;text-align:left}
     </div>
   </div>
 </header>
-
 <div class="hero"><span class="badge" id="t_badge">Gain réel en $ • Retrait USDT</span><h1 id="t_packs_title" style="margin-top:10px">Packs Cadeaux</h1><p id="t_packs_sub">Choisissez un pack, ouvrez-le, recevez un gain réel en dollars ajouté à votre solde</p></div>
-
 <div class="balance-bar">
   <div class="balance-card">
     <div><div class="muted small" id="t_balance_label">Votre solde</div><div class="balance-big"><span id="balanceBig">$0.00</span></div><div class="muted small" id="t_balance_sub">Gain réel • Retirable en USDT</div><div class="muted small" id="userInfoLine" style="margin-top:4px"></div></div>
     <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn-deposit" id="topupBtn2">Dépôt USDT</button><button class="btn-withdraw" id="withdrawBtn2">Retrait</button></div>
   </div>
 </div>
+<div class="offers">
+  <div class="offer"><h3>🎯 <span id="t_offer2_title">BONUS QUOTIDIEN</span></h3><p id="t_offer2_desc">Reviens chaque jour et reçois <b>1$ gratuit</b> sur ton solde. Sans dépôt.</p><button class="offer-btn" id="dailyBtn" onclick="claimDaily()">Réclamer 1$</button></div>
+  <div class="offer"><h3>👥 <span id="t_offer3_title">PARRAINAGE +2$</span></h3><p id="t_offer3_desc">Invite un ami. Quand il dépose, tu reçois <b>2$</b> automatiquement.</p><button class="offer-btn" onclick="copyRef()">Copier mon lien</button></div>
+</div><div class="grid" id="grid"></div>
+<div class="winners"><h3 id="t_winners">Derniers gagnants</h3><div id="winnersList"></div></div>
 
-<div class="grid" id="grid"></div>
-<div class="winners"><h3 id="t_winners">Derniers gagnants</h3><div id="winnersList"></div></div><!-- AUTH MODAL -->
 <div class="modal" id="authModal">
   <div class="modal-box" style="text-align:left">
     <h2 class="center" id="authTitle">Connexion</h2>
@@ -109,7 +117,7 @@ label{font-size:12px;color:#8a92a8;display:block;text-align:left}
     <label>Nom d'utilisateur</label><input id="authUser" placeholder="Ex: amie_27">
     <label>Mot de passe</label><input id="authPass" type="password" placeholder="••••••••">
     <div id="regExtra" style="display:none">
-  <label id="labelConfirm">Confirmer le mot de passe</label><input id="authPass2" type="password" placeholder="••••••••">
+      <label id="labelConfirm">Confirmer le mot de passe</label><input id="authPass2" type="password" placeholder="••••••••">
     </div>
     <p id="authMsg" style="color:#ff6b6b;font-size:13px;text-align:center"></p>
     <button class="btn" style="background:#2ecc8a" id="authSubmitBtn">Continuer</button>
@@ -141,8 +149,14 @@ label{font-size:12px;color:#8a92a8;display:block;text-align:left}
     <label>Votre adresse USDT</label><input id="wAddress" placeholder="0x... ou T...">
     <label>Montant à retirer $</label><input id="wAmount" type="number" placeholder="Ex: 50">
     <div class="preview"><span>Vous recevrez</span><b id="wPreview">$0.00</b></div>
-    
-<div class="modal" id="winModal"><div class="modal-box"><div class="muted small" id="t_win_label">Gain réel ajouté à votre solde</div><h2 id="winPackName"></h2><div class="amount" id="winAmount"></div><div class="meta" id="winMeta"></div><button class="btn" id="closeWinBtn">Terminé</button><button class="btn dark" id="withdrawFromWin">Retirer mes gains</button></div></div><div class="modal" id="adminModal">
+    <button class="btn" style="background:#2ecc8a" id="confirmWithdrawBtn">Confirmer le retrait</button>
+    <button class="btn dark" id="closeWithdrawBtn">Fermer</button>
+  </div>
+</div>
+
+<div class="modal" id="winModal"><div class="modal-box"><div class="muted small" id="t_win_label">Gain réel ajouté à votre solde</div><h2 id="winPackName"></h2><div class="amount" id="winAmount"></div><div class="meta" id="winMeta"></div><button class="btn" id="closeWinBtn">Terminé</button><button class="btn dark" id="withdrawFromWin">Retirer mes gains</button></div></div>
+
+<div class="modal" id="adminModal">
   <div class="modal-box" style="text-align:left;max-width:520px">
     <h2 class="center">Panneau Admin</h2>
     <label>Password</label><input id="pass" type="password">
@@ -167,15 +181,13 @@ label{font-size:12px;color:#8a92a8;display:block;text-align:left}
     <button class="btn dark" id="closeAdminBtn">Fermer</button>
   </div>
 </div>
-
-
-<div class="toast" id="toast"></div><script>
+<script>
 var I18N = {
-  fr:{badge:"Gain réel en $ • Retrait USDT",packs_title:"Packs Cadeaux",packs_sub:"Choisissez un pack, ouvrez-le, recevez un gain réel en dollars ajouté à votre solde",winners:"Derniers gagnants",deposit:"Dépôt",withdraw:"Retrait",open:"Ouvrir le pack",need_money:"Solde insuffisant - Dépôt",max:"Gain jusqu'à",win_label:"Gain réel ajouté à votre solde",balance_label:"Votre solde",balance_sub:"Gain réel • Retirable en USDT"},
-  ar:{badge:"ربح حقيقي بالدولار • سحب USDT",packs_title:"الباكات",packs_sub:"اختر الباك، افتحه، و احصل على ربح حقيقي بالدولار يضاف لرصيدك",winners:"آخر الفائزين",deposit:"إيداع",withdraw:"سحب",open:"فتح الباك",need_money:"رصيد غير كاف - إيداع",max:"ربح حتى",win_label:"ربح حقيقي أضيف لرصيدك",balance_label:"رصيدك",balance_sub:"ربح حقيقي • قابل للسحب USDT"},
-  en:{badge:"Real gain in $ • USDT Withdraw",packs_title:"Gift Packs",packs_sub:"Pick a pack, open it, get a real dollar gain added to your balance",winners:"Latest Winners",deposit:"Deposit",withdraw:"Withdraw",open:"Open Pack",need_money:"Insufficient - Deposit",max:"Win up to",win_label:"Real gain added to your balance",balance_label:"Your balance",balance_sub:"Real gain • Withdrawable in USDT"},
-  es:{badge:"Ganancia real en $ • Retiro USDT",packs_title:"Packs Regalo",packs_sub:"Elige un pack, ábrelo y recibe ganancia real en dólares",winners:"Últimos ganadores",deposit:"Depósito",withdraw:"Retiro",open:"Abrir Pack",need_money:"Saldo insuficiente - Depósito",max:"Gana hasta",win_label:"Ganancia real añadida",balance_label:"Tu saldo",balance_sub:"Ganancia real • Retirable en USDT"},
-  tr:{badge:"Gerçek $ Kazanç • USDT Çekim",packs_title:"Hediye Paketleri",packs_sub:"Bir paket seç, aç, gerçek dolar kazanç bakiyene eklensin",winners:"Son Kazananlar",deposit:"Yatırma",withdraw:"Çekim",open:"Paketi Aç",need_money:"Yetersiz Bakiye - Yatırma",max:"Kadar kazan",win_label:"Gerçek kazanç eklendi",balance_label:"Bakiyeniz",balance_sub:"Gerçek kazanç • USDT ile çekilebilir"}
+  fr:{badge:"Gain réel en $ • Retrait USDT",packs_title:"Packs Cadeaux",packs_sub:"Choisissez un pack, ouvrez-le, recevez un gain réel en dollars ajouté à votre solde",winners:"Derniers gagnants",deposit:"Dépôt",withdraw:"Retrait",open:"Ouvrir le pack",need_money:"Solde insuffisant - Dépôt",max:"Gain jusqu'à",win_label:"Gain réel ajouté à votre solde",balance_label:"Votre solde",balance_sub:"Gain réel • Retirable en USDT",confirm_pass:"Confirmer le mot de passe",offer1_title:"BONUS BIENVENUE +20%",offer1_desc:"Premier dépôt: dépose 20$ et reçois 24$ de solde. Offre unique.",offer2_title:"BONUS QUOTIDIEN",offer2_desc:"Reviens chaque jour et reçois 1$ gratuit sur ton solde. Sans dépôt.",offer3_title:"PARRAINAGE +2$",offer3_desc:"Invite un ami. Quand il dépose, tu reçois 2$ automatiquement.",claim:"Réclamer",claimed:"Déjà réclamé aujourd'hui"},
+  ar:{badge:"ربح حقيقي بالدولار • سحب USDT",packs_title:"الباكات",packs_sub:"اختر الباك، افتحه، و احصل على ربح حقيقي بالدولار يضاف لرصيدك",winners:"آخر الفائزين",deposit:"إيداع",withdraw:"سحب",open:"فتح الباك",need_money:"رصيد غير كاف - إيداع",max:"ربح حتى",win_label:"ربح حقيقي أضيف لرصيدك",balance_label:"رصيدك",balance_sub:"ربح حقيقي • قابل للسحب USDT",confirm_pass:"تأكيد كلمة السر",offer1_title:"مكافأة الترحيب +20%",offer1_desc:"أول إيداع: أودع 20$ و احصل على 24$ رصيد. عرض لمرة واحدة.",offer2_title:"مكافأة يومية",offer2_desc:"ارجع كل يوم و احصل على 1$ مجانا في رصيدك. بدون إيداع.",offer3_title:"دعوة صديق +2$",offer3_desc:"ادع صديقا. عندما يودع، تحصل على 2$ تلقائيا.",claim:"اطلب",claimed:"تم الطلب اليوم"},
+  en:{badge:"Real gain in $ • USDT Withdraw",packs_title:"Gift Packs",packs_sub:"Pick a pack, open it, get a real dollar gain added to your balance",winners:"Latest Winners",deposit:"Deposit",withdraw:"Withdraw",open:"Open Pack",need_money:"Insufficient - Deposit",max:"Win up to",win_label:"Real gain added to your balance",balance_label:"Your balance",balance_sub:"Real gain • Withdrawable in USDT",confirm_pass:"Confirm password",offer1_title:"WELCOME BONUS +20%",offer1_desc:"First deposit: deposit $20 and get $24 balance. One-time offer.",offer2_title:"DAILY BONUS",offer2_desc:"Come back daily and get $1 free on your balance. No deposit.",offer3_title:"REFERRAL +$2",offer3_desc:"Invite a friend. When he deposits, you get $2 automatically.",claim:"Claim",claimed:"Already claimed today"},
+  es:{badge:"Ganancia real en $ • Retiro USDT",packs_title:"Packs Regalo",packs_sub:"Elige un pack, ábrelo y recibe ganancia real en dólares",winners:"Últimos ganadores",deposit:"Depósito",withdraw:"Retiro",open:"Abrir Pack",need_money:"Saldo insuficiente - Depósito",max:"Gana hasta",win_label:"Ganancia real añadida",balance_label:"Tu saldo",balance_sub:"Ganancia real • Retirable en USDT",confirm_pass:"Confirmar contraseña",offer1_title:"BONO BIENVENIDA +20%",offer1_desc:"Primer depósito: deposita 20$ y recibe 24$ de saldo. Oferta única.",offer2_title:"BONO DIARIO",offer2_desc:"Vuelve cada día y recibe 1$ gratis en tu saldo. Sin depósito.",offer3_title:"REFERIDO +2$",offer3_desc:"Invita un amigo. Cuando deposite, recibes 2$ automáticamente.",claim:"Reclamar",claimed:"Ya reclamado hoy"},
+  tr:{badge:"Gerçek $ Kazanç • USDT Çekim",packs_title:"Hediye Paketleri",packs_sub:"Bir paket seç, aç, gerçek dolar kazanç bakiyene eklensin",winners:"Son Kazananlar",deposit:"Yatırma",withdraw:"Çekim",open:"Paketi Aç",need_money:"Yetersiz Bakiye - Yatırma",max:"Kadar kazan",win_label:"Gerçek kazanç eklendi",balance_label:"Bakiyeniz",balance_sub:"Gerçek kazanç • USDT ile çekilebilir",confirm_pass:"Şifreyi onayla",offer1_title:"HOŞ GELDİN BONUSU +%20",offer1_desc:"İlk yatırım: 20$ yatır, 24$ bakiye al. Tek seferlik.",offer2_title:"GÜNLÜK BONUS",offer2_desc:"Her gün gel ve bakiyene 1$ ücretsiz al. Yatırımsız.",offer3_title:"DAVET +2$",offer3_desc:"Bir arkadaşını davet et. Yatırım yapınca 2$ kazan.",claim:"Al",claimed:"Bugün zaten alındı"}
 };
 var lang = 'fr';
 var packs = [
@@ -196,7 +208,6 @@ var winners = [{name:'user_41', pack:'Lucky', amount:312},{name:'user_18', pack:
 var withdraws = [];
 var balance = 0;
 var addrs = {BEP20:'0xF5DE551585Dbe6f95c1A46ecC9acC8e4643d1466', ERC20:'0xF5DE551585Dbe6f95c1A46ecC9acC8e4643d1466', TRC20:'TDxgQ31JQyQvCYsHwQnuZ4UvLnFDd7sHcx'};
-// ===== SYSTEME COMPTES =====
 var users = JSON.parse(localStorage.getItem('poke_users')||'{}');
 var currentUser = localStorage.getItem('poke_current')||null;
 var authMode = 'login';
@@ -209,7 +220,7 @@ function renderAuthArea(){
   var el=document.getElementById('authArea');
   if(currentUser && users[currentUser]){
     el.innerHTML='<span class="user-chip">👤 '+currentUser+'</span><button class="btn-withdraw" style="padding:9px 14px" onclick="logoutUser()">Sortir</button>';
-    document.getElementById('userInfoLine').textContent='Connecté en tant que '+currentUser+' • '+ (users[currentUser].phone||'');
+    document.getElementById('userInfoLine').textContent='Connecté en tant que '+currentUser;
   }else{
     el.innerHTML='<button class="btn-withdraw" style="padding:9px 14px" onclick="openAuth(\'login\')">Connexion</button><button class="btn-deposit" onclick="openAuth(\'register\')">S\'inscrire</button>';
     document.getElementById('userInfoLine').textContent='Connecte-toi pour jouer avec ton propre solde';
@@ -219,12 +230,15 @@ function logoutUser(){ currentUser=null; balance=0; saveUsers(); renderAuthArea(
 function doAuth(){
   var name=document.getElementById('authUser').value.trim();
   var pass=document.getElementById('authPass').value;
-  var phone=document.getElementById('authPhone').value.trim();
+  var pass2El=document.getElementById('authPass2');
+  var pass2=pass2El ? pass2El.value : pass;
   var msg=document.getElementById('authMsg');
   if(!name||!pass){ msg.textContent='Remplis nom + mot de passe'; return; }
   if(authMode==='register'){
     if(users[name]){ msg.textContent='Ce nom existe déjà, choisis un autre'; return; }
-    users[name]={name:name,pass:pass,phone:phone,balance:0,history:[]};
+    if(pass!==pass2){ msg.textContent='Les mots de passe ne correspondent pas'; return; }
+    if(pass.length<4){ msg.textContent='Mot de passe: min 4 caractères'; return; }
+    users[name]={name:name,pass:pass,balance:0,history:[],created:new Date().toLocaleString(),lastDaily:''};
     currentUser=name; balance=0; saveUsers(); hideModal('authModal'); renderAuthArea(); render(); toast('Bienvenue '+name+' 🎉 Compte créé !');
   }else{
     if(!users[name]||users[name].pass!==pass){ msg.textContent='Nom ou mot de passe incorrect'; return; }
@@ -232,12 +246,25 @@ function doAuth(){
   }
 }
 document.getElementById('authSubmitBtn').onclick=doAuth;
-// ===== FIN COMPTES =====
-    <button class="btn" style="background:#2ecc8a" id="confirmWithdrawBtn">Confirmer le retrait</button>
-    <button class="btn dark" id="closeWithdrawBtn">Fermer</button>
-  </div>
-                                                                           </div>
-
+function claimDaily(){
+  if(!currentUser){ openAuth('login'); toast('Connecte-toi pour réclamer'); return; }
+  var today=new Date().toDateString();
+  var u=users[currentUser];
+  if(u.lastDaily===today){ toast('Déjà réclamé aujourd\'hui'); return; }
+  u.lastDaily=today; balance+=1; syncBalanceToUser(); render(); toast('Bonus quotidien +1$ 🎉');
+}
+function copyRef(){
+  if(!currentUser){ openAuth('login'); return; }
+  var link=location.origin+location.pathname+'?ref='+currentUser;
+  if(navigator.clipboard) navigator.clipboard.writeText(link);
+  toast('Lien copié: '+link);
+}
+function adminDeleteUser(name){
+  if(!confirm('Supprimer '+name+' ?')) return;
+  delete users[name];
+  if(currentUser===name){ currentUser=null; balance=0; }
+  saveUsers(); renderAuthArea(); render(); toast('Utilisateur supprimé');
+}
   var ADMIN_PASS = localStorage.getItem('poke_admin_pass') || '1234';
 function t(k){ return (I18N[lang] && I18N[lang][k]) || I18N.fr[k] || k; }
 function toast(m){ var el=document.getElementById('toast'); el.textContent=m; el.style.display='block'; setTimeout(function(){el.style.display='none';},3500); }
@@ -266,6 +293,11 @@ function render(){
   document.getElementById('winnersList').innerHTML = wHtml;
   document.getElementById('myBalance').textContent = money(balance);
   document.getElementById('balanceBig').textContent = money(balance);
+  var db=document.getElementById('dailyBtn');
+  if(db){
+    if(currentUser && users[currentUser] && users[currentUser].lastDaily===new Date().toDateString()){ db.textContent=t('claimed'); db.disabled=true; }
+    else { db.textContent=t('claim')+' 1$'; db.disabled=false; }
+  }
   var eHtml = '';
   for(var k=0;k<packs.length;k++){
     eHtml += '<div style="background:#131724;border:1px solid #2b3350;border-radius:14px;padding:12px;margin-bottom:8px;text-align:left"><b>'+packs[k].name+' PACK</b><label>Price $</label><input id="ep'+k+'" type="number" value="'+packs[k].price+'"><label>Max Gain $</label><input id="em'+k+'" type="number" value="'+packs[k].max+'"><label>Return %</label><input id="er'+k+'" type="number" value="'+packs[k].ret+'"><label>Image URL</label><input id="ei'+k+'" value="'+packs[k].img+'" placeholder="https://.../gold.png"></div>';
@@ -275,7 +307,7 @@ function render(){
   document.getElementById('adminAddrEVM').value = addrs.BEP20;
   document.getElementById('adminAddrTRC').value = addrs.TRC20;
   document.getElementById('withdrawList').innerHTML = withdraws.length ? withdraws.map(function(w){return '<div style="background:#131724;padding:10px;border-radius:10px;margin-bottom:6px;font-size:13px">'+w.amount+'$ → '+w.addr+' ('+w.network+') — '+w.status+'</div>';}).join('') : '<p class="muted small">Aucun retrait</p>';
-  var uList = Object.values(users).map(function(u){ return '<div style="background:#131724;padding:10px;border-radius:10px;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center"><span>👤 <b>'+u.name+'</b><br><span class="muted small">'+(u.phone||'')+' • '+money(u.balance)+' • '+(u.history?u.history.length:0)+' packs</span></span><button class="btn" style="width:auto;padding:8px 12px;background:#2ecc8a;margin:0" onclick="adminAddBalance(\''+u.name+'\')">+ Solde</button></div>'; }).join('') || '<p class="muted small">Aucun utilisateur inscrit pour le moment</p>';
+  var uList = Object.values(users).map(function(u){ return '<div style="background:#131724;padding:10px;border-radius:10px;margin-bottom:6px"><div style="display:flex;justify-content:space-between;align-items:center"><span>👤 <b>'+u.name+'</b><br><span class="muted small">Créé: '+(u.created||'-')+' • '+money(u.balance)+' • '+(u.history?u.history.length:0)+' packs</span></span><div style="display:flex;gap:6px"><button class="btn" style="width:auto;padding:8px 12px;background:#2ecc8a;margin:0" onclick="adminAddBalance(\''+u.name+'\')">+ Solde</button><button class="btn" style="width:auto;padding:8px 10px;background:#ff4757;margin:0" onclick="adminDeleteUser(\''+u.name+'\')">✕</button></div></div></div>'; }).join('') || '<p class="muted small">Aucun utilisateur inscrit pour le moment</p>';
   document.getElementById('usersList').innerHTML = uList;
 }
 function adminAddBalance(name){ var a=parseFloat(prompt('Combien ajouter à '+name+' ?')); if(!a) return; users[name].balance=(users[name].balance||0)+a; if(currentUser===name) balance=users[name].balance; saveUsers(); render(); toast('Solde ajouté à '+name); }
@@ -294,6 +326,13 @@ function setLang(l){
   document.getElementById('topupBtn2').textContent = t('deposit')+' USDT';
   document.getElementById('withdrawBtnTop').textContent = t('withdraw');
   document.getElementById('withdrawBtn2').textContent = t('withdraw');
+  document.getElementById('t_offer1_title').textContent = t('offer1_title');
+  document.getElementById('t_offer1_desc').innerHTML = t('offer1_desc');
+  document.getElementById('t_offer2_title').textContent = t('offer2_title');
+  document.getElementById('t_offer2_desc').innerHTML = t('offer2_desc');
+  document.getElementById('t_offer3_title').textContent = t('offer3_title');
+  document.getElementById('t_offer3_desc').innerHTML = t('offer3_desc');
+  var lc=document.getElementById('labelConfirm'); if(lc) lc.textContent=t('confirm_pass');
   render();
 }
 function openPack(id){
@@ -384,3 +423,4 @@ document.getElementById('depositAddr').textContent = addrs.BEP20;
 </script>
 </body>
 </html>
+<div class="toast" id="toast"></div>
