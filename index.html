@@ -249,7 +249,6 @@ var packs = [
   {id:'ultimate', name:'Ultimate', price:1000, max:9950.00, ret:96, color:'linear-gradient(160deg,#fff3c4,#f39c12)', img:'', tag:'ULTIMATE'},
   {id:'mega', name:'Mega', price:1500, max:14900.00, ret:96, color:'linear-gradient(160deg,#111,#ff4757)', img:'', tag:'MEGA', lucky:true}
 ];
-var winners = [{name:'user_41', pack:'Lucky', amount:312},{name:'user_18', pack:'Gold', amount:145},{name:'user_77', pack:'Diamond', amount:820},{name:'user_99', pack:'Royal', amount:2100}];
 var withdraws = JSON.parse(localStorage.getItem('poke_withdraws')||'[]');
 var deposits = JSON.parse(localStorage.getItem('poke_deposits')||'[]');
 function saveDeposits(){ localStorage.setItem('poke_deposits', JSON.stringify(deposits)); }
